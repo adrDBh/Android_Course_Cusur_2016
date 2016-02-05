@@ -31,6 +31,14 @@ public class SectionActivity extends AppCompatActivity {
         pager.setAdapter(adapter);
 
 
+
+
+
+
+
+
+        
+
         // Asigns color to tab sliding layout
         tabs.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
             @Override
