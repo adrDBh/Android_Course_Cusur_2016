@@ -5,9 +5,12 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Camera;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -16,6 +19,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+
+import java.io.File;
+import java.util.BitSet;
 
 import adrdbh.android.curso.ejercicio1.R;
 import adrdbh.android.curso.ejercicio1.actividades.MainActivity;
@@ -27,6 +33,13 @@ import adrdbh.android.curso.ejercicio1.actividades.SectionActivity;
 
 public class CameraFragment extends Fragment {
 
+    // Image variable that covers all image extensions
+    private Bitmap mBitmap;
+    private String mDir;
+    private static String MEDIA_DIRECTORY = "Ejercicio1/media";
+    private static String TEMPORAL_PICTURE_NAME = "temp.jpg";
+    // Prestablished return of error code in running camera
+    private final static int CAMERA = 100;
     // Prestablished return of error code in image selection
     private static final int SELECT_PICTURE = 200;
     // Sets image background from the ImageView area
@@ -64,7 +77,7 @@ public class CameraFragment extends Fragment {
                     // Action after option selection
                     public void onClick(DialogInterface dialog, int which) {
                         if (which == 0) {
-                            // Not yet implemented
+                            // Opens camera,takes picture and sets background
                             openCamera();
                         } else if (which == 1) {
                             // Selects image from gallery
@@ -106,15 +119,35 @@ public class CameraFragment extends Fragment {
                 if (resultCode == Activity.RESULT_OK) {
                     // gets path of image
                     Uri path = data.getData();
-                    // Sets the image in the selected area
+                    // Sets the image in the selected area (view)
                     mSetPicture.setImageURI(path);
                 }
+                break;
+            case CAMERA:
+                if (resultCode == Activity.RESULT_OK) {
+                    mDir = Environment.getExternalStorageDirectory() + File.separator + MEDIA_DIRECTORY + File.separator + TEMPORAL_PICTURE_NAME;
+                    mBitmap = BitmapFactory.decodeFile(mDir);
+                    mSetPicture.setImageBitmap(mBitmap);
+                }
+                break;
         }
     }
 
-    //NOT IMPLEMENTED YET
+    //Required method to launch, write, capture and save Camera pictures.
     private void openCamera() {
-
+        File file = new File(Environment.getExternalStorageDirectory(), MEDIA_DIRECTORY);
+        // Saves file t dir
+        file.mkdirs();
+        // String variale that asigns image save path value
+        String path = Environment.getExternalStorageDirectory() + File.separator + MEDIA_DIRECTORY + File.separator + TEMPORAL_PICTURE_NAME;
+        // Creates the new file and stores it
+        File newFile = new File(path);
+        // Grants focus to the camera app
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        // Get image in Uri format
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(newFile));
+        // Starts intent and opens camera
+        startActivityForResult(intent, CAMERA);
     }
 
 }
